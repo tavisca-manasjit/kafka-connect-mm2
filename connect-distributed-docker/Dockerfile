@@ -1,9 +1,10 @@
-FROM centos:latest
+FROM amazonlinux:latest
 
 RUN yum install -y wget tar openssh-server openssh-clients sysstat sudo which openssl hostname
 RUN yum install -y java-1.8.0-openjdk-devel
-RUN yum install -y epel-release &&\
+RUN amazon-linux-extras install epel -y &&\
     yum install -y jq &&\
+    yum install -y telnet &&\
     yum install -y python3 &&\
     yum install -y nmap-ncat git
 ARG MAVEN_VERSION=3.5.4
@@ -28,12 +29,26 @@ ENV KAFKA_VERSION 2.7.0
 
 RUN yum -y update && yum -y install tar gzip wget
 
-RUN curl http://mirrors.gigenet.com/apache/kafka/${KAFKA_VERSION}/kafka_${SCALA_VERSION}-${KAFKA_VERSION}.tgz | tar -zx -C /opt
+#RUN curl http://mirrors.gigenet.com/apache/kafka/${KAFKA_VERSION}/kafka_${SCALA_VERSION}-${KAFKA_VERSION}.tgz | tar -zx -C /opt
+RUN curl https://archive.apache.org/dist/kafka/${KAFKA_VERSION}/kafka_${SCALA_VERSION}-${KAFKA_VERSION}.tgz | tar -zx -C /opt
 
 
 RUN git clone https://github.com/aws-samples/mirrormaker2-msk-migration.git
 WORKDIR mirrormaker2-msk-migration/CustomMM2ReplicationPolicy
 RUN mvn clean install
+
+RUN mkdir -p /opt/jmx_exporter
+RUN wget  https://repo1.maven.org/maven2/io/prometheus/jmx/jmx_prometheus_javaagent/0.16.1/jmx_prometheus_javaagent-0.16.1.jar 
+RUN mv ./jmx_prometheus_javaagent-0.16.1.jar /opt/jmx_exporter/ 
+
+
+
+#RUN wget https://raw.githubusercontent.com/prometheus/jmx_exporter/master/example_configs/kafka-connect.yml
+#RUN mv ./kafka-connect.yml /opt/jmx_exporter/
+ADD mm2-config.yml /opt/jmx_exporter/
+
+ENV KAFKA_JMX_OPTS -javaagent:/opt/jmx_exporter/jmx_prometheus_javaagent-0.16.1.jar=8080:/opt/jmx_exporter/mm2-config.yml
+
 
 # # Initialize the Kafka cert trust store
 RUN find /usr/lib/jvm/ -name "cacerts" -exec cp {} /tmp/kafka.client.truststore.jks \;
@@ -53,5 +68,6 @@ RUN chmod 777 /opt/start-kafka-connect.sh
 RUN yum clean all;
 
 EXPOSE 8083
+EXPOSE 8080 
 USER root
 ENTRYPOINT /opt/start-kafka-connect.sh
