@@ -38,8 +38,8 @@ WORKDIR mirrormaker2-msk-migration/CustomMM2ReplicationPolicy
 RUN mvn clean install
 
 RUN mkdir -p /opt/jmx_exporter
-RUN wget  https://repo1.maven.org/maven2/io/prometheus/jmx/jmx_prometheus_javaagent/0.16.1/jmx_prometheus_javaagent-0.16.1.jar 
-RUN mv ./jmx_prometheus_javaagent-0.16.1.jar /opt/jmx_exporter/ 
+RUN wget  https://repo1.maven.org/maven2/io/prometheus/jmx/jmx_prometheus_javaagent/0.16.1/jmx_prometheus_javaagent-0.16.1.jar
+RUN mv ./jmx_prometheus_javaagent-0.16.1.jar /opt/jmx_exporter/
 
 
 
@@ -49,6 +49,10 @@ ADD mm2-config.yml /opt/jmx_exporter/
 
 ENV KAFKA_JMX_OPTS -javaagent:/opt/jmx_exporter/jmx_prometheus_javaagent-0.16.1.jar=8080:/opt/jmx_exporter/mm2-config.yml
 
+# # Setting heap env variable
+#ENV KAFKA_HEAP_OPTS "-Xmx8G"
+ENV KAFKA_HEAP_OPTS="-Xms256M -Xmx8G"
+# ENV KAFKA_HEAP_OPTS "-Xms8G"
 
 # # Initialize the Kafka cert trust store
 RUN find /usr/lib/jvm/ -name "cacerts" -exec cp {} /tmp/kafka.client.truststore.jks \;
@@ -68,6 +72,6 @@ RUN chmod 777 /opt/start-kafka-connect.sh
 RUN yum clean all;
 
 EXPOSE 8083
-EXPOSE 8080 
+EXPOSE 8080
 USER root
 ENTRYPOINT /opt/start-kafka-connect.sh
