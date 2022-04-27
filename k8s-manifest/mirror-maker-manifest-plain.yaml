@@ -1,0 +1,34 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mirror-maker
+spec:
+  replicas: 6
+  selector:
+      matchLabels:
+        app.kubernetes.io/name: mirror-maker
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: mirror-maker
+    spec:
+      containers:
+      - name: mirror-maker
+        image: ecrurl/mm2:plaintext
+        resources:
+          requests:
+            memory: "1Gi"
+            cpu: 1
+        imagePullPolicy: Always
+        ports:
+          - containerPort: 8083
+        env:
+        - name: "BROKERS"
+          value: "Broker URL:9092"
+        - name: "USERNAME"
+          value: "username"
+        - name: "PASSWORD"
+          value: "password"
+        - name: "GROUP"
+          value: "mirrorm2"
+

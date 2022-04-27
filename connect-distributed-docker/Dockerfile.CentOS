@@ -1,10 +1,10 @@
-FROM amazonlinux:latest
-
+FROM centos:latest
+RUN sed -i 's/mirrorlist/#mirrorlist/g' /etc/yum.repos.d/CentOS-*
+RUN sed -i 's|#baseurl=http://mirror.centos.org|baseurl=http://vault.centos.org|g' /etc/yum.repos.d/CentOS-*
 RUN yum install -y wget tar openssh-server openssh-clients sysstat sudo which openssl hostname
 RUN yum install -y java-1.8.0-openjdk-devel
-RUN amazon-linux-extras install epel -y &&\
+RUN yum install -y epel-release &&\
     yum install -y jq &&\
-    yum install -y telnet &&\
     yum install -y python3 &&\
     yum install -y nmap-ncat git
 ARG MAVEN_VERSION=3.5.4
@@ -20,7 +20,8 @@ ENV M2 $M2_HOME/bin
 ENV PATH $M2:$PATH
 
 
-RUN wget https://bootstrap.pypa.io/get-pip.py
+#RUN wget https://bootstrap.pypa.io/get-pip.py
+RUN wget https://bootstrap.pypa.io/pip/3.6/get-pip.py
 RUN python3 get-pip.py
 RUN pip3 install awscli
 
@@ -32,23 +33,9 @@ RUN yum -y update && yum -y install tar gzip wget
 #RUN curl http://mirrors.gigenet.com/apache/kafka/${KAFKA_VERSION}/kafka_${SCALA_VERSION}-${KAFKA_VERSION}.tgz | tar -zx -C /opt
 RUN curl https://archive.apache.org/dist/kafka/${KAFKA_VERSION}/kafka_${SCALA_VERSION}-${KAFKA_VERSION}.tgz | tar -zx -C /opt
 
-
 RUN git clone https://github.com/aws-samples/mirrormaker2-msk-migration.git
 WORKDIR mirrormaker2-msk-migration/CustomMM2ReplicationPolicy
 RUN mvn clean install
-
-RUN mkdir -p /opt/jmx_exporter
-RUN wget  https://repo1.maven.org/maven2/io/prometheus/jmx/jmx_prometheus_javaagent/0.16.1/jmx_prometheus_javaagent-0.16.1.jar 
-RUN mv ./jmx_prometheus_javaagent-0.16.1.jar /opt/jmx_exporter/ 
-
-
-
-#RUN wget https://raw.githubusercontent.com/prometheus/jmx_exporter/master/example_configs/kafka-connect.yml
-#RUN mv ./kafka-connect.yml /opt/jmx_exporter/
-ADD mm2-config.yml /opt/jmx_exporter/
-
-ENV KAFKA_JMX_OPTS -javaagent:/opt/jmx_exporter/jmx_prometheus_javaagent-0.16.1.jar=8080:/opt/jmx_exporter/mm2-config.yml
-
 
 # # Initialize the Kafka cert trust store
 RUN find /usr/lib/jvm/ -name "cacerts" -exec cp {} /tmp/kafka.client.truststore.jks \;
@@ -63,12 +50,10 @@ RUN mv target/CustomMM2ReplicationPolicy-1.0-SNAPSHOT.jar /opt/kafka_2.13-2.7.0/
 ADD start-kafka-connect.sh /opt/start-kafka-connect.sh
 RUN mkdir -p /opt/logs
 RUN chmod 777 /opt/start-kafka-connect.sh
-RUN cp -pr /etc/pki/ca-trust/extracted/java/cacerts /tmp/ 
-RUN mv /tmp/cacerts /tmp/kafka.client.truststore.jks
+
 # cleanup
 RUN yum clean all;
 
 EXPOSE 8083
-EXPOSE 8080 
 USER root
 ENTRYPOINT /opt/start-kafka-connect.sh

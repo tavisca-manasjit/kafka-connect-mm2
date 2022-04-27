@@ -3,13 +3,15 @@
     "connector.class": "org.apache.kafka.connect.mirror.MirrorCheckpointConnector",
     "clusters": "prim, sec",
     "source.cluster.alias": "prim",
-    "source.cluster.bootstrap.servers": "Broker URL:9094",
-    "source.cluster.security.protocol": "SSL",
-    "source.cluster.ssl.truststore.location": "/tmp/kafka.client.truststore.jks",
+    "source.cluster.bootstrap.servers": "Broker URL:9096",
+    "source.cluster.security.protocol": "SASL_SSL",
+    "source.cluster.sasl.mechanism" : "SCRAM-SHA-512",
+    "source.cluster.sasl.jaas.config" :" org.apache.kafka.common.security.scram.ScramLoginModule required  username=\"username\"  password=\"password\"; ",
     "target.cluster.alias": "sec",
-    "target.cluster.bootstrap.servers": "Broker URL:9094",
-    "target.cluster.security.protocol": "SSL",
-    "target.cluster.ssl.truststore.location": "/tmp/kafka.client.truststore.jks",
+    "target.cluster.bootstrap.servers": "Broker URL:9096",
+    "target.cluster.security.protocol": "SASL_SSL",
+    "target.cluster.sasl.mechanism" : "SCRAM-SHA-512",
+    "target.cluster.sasl.jaas.config" :" org.apache.kafka.common.security.scram.ScramLoginModule required  username=\"username\"  password=\"password\"; ",
     "replication.policy.class": "com.amazonaws.kafka.samples.CustomMM2ReplicationPolicy",
     "tasks.max": "2",
     "key.converter": " org.apache.kafka.connect.converters.ByteArrayConverter",
@@ -21,4 +23,3 @@
     "sync.group.offsets.enabled": "true",
     "sync.group.offsets.interval.seconds": "10"
 }
-

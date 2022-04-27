@@ -1,0 +1,22 @@
+{
+    "name": "mm2-hbc",
+    "connector.class": "org.apache.kafka.connect.mirror.MirrorHeartbeatConnector",
+    "replication.policy.class":"com.amazonaws.kafka.samples.CustomMM2ReplicationPolicy",
+    "clusters": "prim, sec",
+    "source.cluster.alias": "prim",
+    "source.cluster.bootstrap.servers": "Broker URL:9092",
+    "source.cluster.security.protocol": "SASL_SSL",
+    "source.cluster.sasl.mechanism" : "PLAIN",
+    "source.cluster.sasl.jaas.config" :" org.apache.kafka.common.security.plain.PlainLoginModule required  username=\"username\"  password=\"password\"; ",
+    "target.cluster.alias": "sec",
+    "target.cluster.bootstrap.servers": "Broker URL:9092",
+    "source.cluster.security.protocol": "SASL_SSL",
+    "source.cluster.sasl.mechanism" : "PLAIN",
+    "source.cluster.sasl.jaas.config" :" org.apache.kafka.common.security.plain.PlainLoginModule required  username=\"username\"  password=\"password\"; ",
+    "tasks.max": "2",
+    "key.converter": " org.apache.kafka.connect.converters.ByteArrayConverter",
+    "value.converter": "org.apache.kafka.connect.converters.ByteArrayConverter",
+    "replication.factor": "3",
+    "heartbeats.topic.replication.factor": "2",
+    "emit.heartbeats.interval.seconds": "20"
+}

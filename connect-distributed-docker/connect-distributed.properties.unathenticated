@@ -88,17 +88,16 @@ rest.port=8083
 # Authentication settings for Connect workers
 #security settings
 ##sasl.mechanism=SCRAM-SHA-512
-#sasl.mechanism=PLAIN
+sasl.mechanism=PLAIN
 # Configure SASL_SSL if SSL encryption is enabled, otherwise configure SASL_PLAINTEXT
-#security.protocol=SASL_SSL
-#sasl.jaas.config=org.apache.kafka.common.security.plain.PlainLoginModule required \
-#  username=USERNAME \
-#  password=PASSWORD;
+##security.protocol=SASL_SSL
+##sasl.jaas.config=org.apache.kafka.common.security.plain.PlainLoginModule required \
+##  username=USERNAME \
+##  password=PASSWORD;
 ##sasl.jaas.config=org.apache.kafka.common.security.scram.ScramLoginModule  required \
 ##  username=USERNAME \
 ##  password=PASSWORD;
-security.protocol=SSL
-ssl.truststore.location=/tmp/kafka.client.truststore.jks
+# ssl.truststore.location=/tmp/kafka.client.truststore.jks
 # ssl.truststore.password=changeit
 # ssl.keystore.location=/tmp/kafka.client.keystore.jks
 # ssl.keystore.password=password
@@ -108,15 +107,14 @@ socket.connection.setup.timeout.max.ms = 127000
 # Authentication settings for Connect producers used with source connectors
 ##producer.security.protocol=SASL_SSL
 ##producer.sasl.mechanism=SCRAM-SHA-512
-#producer.sasl.mechanism=PLAIN
-#producer.sasl.jaas.config=org.apache.kafka.common.security.plain.PlainLoginModule required \
-#  username=USERNAME \
-#  password=PASSWORD;
+producer.sasl.mechanism=PLAIN
+##producer.sasl.jaas.config=org.apache.kafka.common.security.plain.PlainLoginModule required \
+##  username=USERNAME \
+##  password=PASSWORD;
 ##producer.sasl.jaas.config=corg.apache.kafka.common.security.scram.ScramLoginModule  required \
 ##  username=USERNAME \
 ##  password=PASSWORD;
-producer.security.protocol=SSL
-producer.ssl.truststore.location=/tmp/kafka.client.truststore.jks
+# producer.ssl.truststore.location=/tmp/kafka.client.truststore.jks
 # producer.ssl.truststore.password=changeit
 # producer.ssl.keystore.location=/tmp/kafka.client.keystore.jks
 # producer.ssl.keystore.password=password
